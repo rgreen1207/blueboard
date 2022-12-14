@@ -1,0 +1,62 @@
+[
+    {
+        "model": "user.user_class",
+        "fields": {
+            "uuid": "",
+            "name": "BoJack Horseman",
+            "username": "bojackhorseman",
+            "email": "bojack@horseman.com",
+            "sms":"1234567890",
+            "created":8222014,
+            "lastseen":1312020
+        }
+    },
+    {
+        "model": "user.user_class",
+        "fields": {
+            "uuid": "",
+            "name": "Sterling Archer",
+            "username": "worldsgreatestspy",
+            "email": "sterlin@theagency.com",
+            "sms":"1230987654",
+            "created":9172009,
+            "lastseen":11122022
+        }
+    },
+    {
+        "model": "user.user_class",
+        "fields": {
+            "uuid": "",
+            "name": "Philip J. Fry",
+            "username": "deliveryboy",
+            "email": "fry@planetexpress.com",
+            "sms":"1999300031",
+            "created":3281999,
+            "lastseen":9042013
+        }
+    },
+    {
+        "model": "user.user_class",
+        "fields": {
+            "uuid": "",
+            "name": "Bob Belcher",
+            "username": "burgeroftheday",
+            "email": "bob@burgers.com",
+            "sms":"3222432233",
+            "created":3281999,
+            "lastseen":9042013
+        }
+    },
+    {
+        "model": "user.user_class",
+        "fields": {
+            "uuid": "",
+            "name": "Homer Simpson",
+            "username": "mmmmmdonuts",
+            "email": "homer@springfieldnuclear.com",
+            "sms":"7421329874562",
+            "created":3281999,
+            "lastseen":9042013
+        }
+    }
+]

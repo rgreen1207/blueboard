@@ -1,15 +1,17 @@
-import cgi, types
+import cgi
+import gevent
 from json import loads, dumps
 from copy import deepcopy
 from urllib import parse as urlparse
 
+from api.request_management import RequestManagement
 from gevent.pywsgi import WSGIServer
-import gevent
+
 
 def parseAndDelistArguments(args): 
-	if type(args) in [types.StringType, types.UnicodeType] and args[:1] in ['{', '[']:
+	if isinstance(args, (str, type(u""))) and args[:1] in ['{', '[']:
 		args = loads(args)
-		if type(args) in [types.ListType, types.ListType]: return args;
+		if isinstance(args, list): return args;
 	else:
 		args = urlparse.parse_qs(args)
 
@@ -24,7 +26,7 @@ def delistArguments(args):
 	'''
 	
 	def flatten(k,v):
-		if len(v) == 1 and type(v) is types.ListType: return (str(k), v[0]);
+		if len(v) == 1 and isinstance(v, list): return (str(k), v[0]);
 		return (str(k), v)
 
 	return dict([flatten(k,v) for k,v in args.items()])
@@ -44,6 +46,7 @@ def application(env, start_response):
 		return ''
 	
 	path = path.split('/')
+    
 	if len(path) < 2 or path[1] != 'v1.0':
 		start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
 		return 'invalid API version'
@@ -55,12 +58,13 @@ def application(env, start_response):
 	method = env['REQUEST_METHOD'].upper()
 	print('method:', method)
 	
-	args = wu.parseAndDelistArguments(env['QUERY_STRING'])
+	args = parseAndDelistArguments(env['QUERY_STRING'])
 	print('args: ', args)
 
 	wsgi_input = env['wsgi.input']
 
 	if wsgi_input.content_length and method != 'PUT':
+		print('wsgi_input: ', wsgi_input.content_length)
 		post_env = env.copy()
 		post_env['QUERY_STRING'] = ''
 		form = cgi.FieldStorage(
@@ -81,10 +85,10 @@ def application(env, start_response):
 			'path' : path,
 			'args' : args,
 			'method' : method,
-			'response': RESPONSE #the output of the functions you call
+			'response': RequestManagement(path, method, args).handle_request()
 		}
-		
 		start_response('200 OK', [('Content-Type', 'application/json')])
+		print("dump of ret: ", dumps(ret))
 		return dumps(ret)
 
 	except Exception as inst:

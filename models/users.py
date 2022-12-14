@@ -1,18 +1,15 @@
 import datetime
 import hashlib
+import uuid
 
-from sqlalchemy.orm import registry
 from dataclasses import dataclass
 
-mapper_registry = registry()
-
-@mapper_registry.mapped
 @dataclass
 class User:
     __tablename__ = "users"
     __sa_dataclass_metadata_key__ = "sa"
     
-    pid: int
+    #pid: int = None
     uuid: str = None
     username: str = None
     name: str = None
@@ -21,8 +18,8 @@ class User:
     created: int = None
     lastseen: int = None
     
-    def set_uuid(self, uuid):
-        self.uuid = hashlib.sha224(uuid).digest()
+    def generate_uuid():
+        return hashlib.sha224(str(uuid.uuid4()).encode()).hexdigest() 
         
     def created_to_date(self):
         #assuming mm-dd-yyyy
@@ -38,6 +35,5 @@ class User:
             month=self.lastseen[0:2],
             day=self.lastseen[2:4],
             year=self.lastseen[4:]
-            )
+        )
 
-#Users.objects.all()
