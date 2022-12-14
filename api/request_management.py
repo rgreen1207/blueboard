@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from .db_handler import dbHandler
 from .response_handler import ResponseHandler
 from models import User
@@ -26,10 +26,10 @@ class RequestManagement:
                     res = self.getUser(self.path[1])
                                         
             elif self.method == 'POST':
-                res = self.createUser(self.args)
+                res = self.createUser()
                 
             elif self.method == 'PUT':
-                res = self.updateUser(self.getUserId())
+                res = self.updateUser(self.path[1])
                 
             elif self.method == 'DELETE':
                 res = self.deleteUser(self.path[1])
@@ -40,24 +40,33 @@ class RequestManagement:
     def getAllUsers(self):
         self.db.execute(self.db.selectAllStatement)
         res = self.db.CURSOR.fetchall()
-        res = ResponseHandler.list_tuple_to_class_dict(res)
-        return res
+        return ResponseHandler.list_tuple_to_class_dict(res)
 
     def getUser(self, id):
         self.db.execute(self.db.selectUUIDStatement % id)
         res = self.db.CURSOR.fetchone()
-        res = ResponseHandler.single_tuple_to_class_dict(res)
-        return res
-
-    def createUser(self, argsList):
-        newUser = self.createUserClass(argsList)
-        self.db.execute_addition(self.db.insertStatement, newUser)
+        return ResponseHandler.single_tuple_to_class_dict(res)
+        
+    def createUser(self):
+        print("creating new user: ", self.args)
+        newUser = self.createUserClass()
+        self.db.execute_data(self.db.insertStatement, newUser)
         self.db.commit()
-        res = self.getUser(newUser.uuid)
-        return res
+        return self.getUser(newUser.uuid)
 
-    def updateUser(self, id, argsList):
-        pass
+    def updateUser(self, id):
+        print("updating user: ", self.args)
+        self.db.execute(self.db.selectUUIDStatement % id)
+        res = self.db.CURSOR.fetchone()
+        self.db.CURSOR.close()
+        self.db.CURSOR = self.db.CONN.cursor()
+        user = User(*res[1:])
+        self.updateUserItems(user)
+        data = (user.username, user.name, user.email,
+                user.sms, user.created, user.lastseen, user.uuid)
+        print("about to execute")
+        self.db.execute_data(self.db.updateUserStatement, data)
+        self.db.commit()
         return self.getUser(id)
 
     def deleteUser(self, id):
@@ -66,13 +75,20 @@ class RequestManagement:
         return {'uuid': id,
                 'status': 'deleted'}
 
-    def createUserClass(self, argsList):
+
+
+    def createUserClass(self):
+        print("argsList: ", self.args)
         id = User.generate_uuid()
         newUser = User()
         newUser.uuid = id
-        for k,v in argsList.items():
-            if k == 'created' or k == 'lastseen':
-                newUser.__setattr__(k, int(v))
-            else:
-                newUser.__setattr__(k, v)
+        newUser = self.updateUserItems(newUser)
         return newUser
+    
+    def updateUserItems(self, user):
+        for k,v in self.args.items():
+            if k == 'created' or k == 'lastseen':
+                user.__setattr__(k, int(v))
+            else:
+                user.__setattr__(k, v)
+        return user

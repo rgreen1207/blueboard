@@ -22,7 +22,7 @@ class dbHandler():
     
     deleteUserStatement = ("DELETE FROM users WHERE uuid = '%s'")
     
-    updateUserStatement = ("UPDATE users SET")
+    updateUserStatement = ("UPDATE users SET username=%s, name=%s, email=%s, sms=%s, created=%s, lastseen= %s WHERE uuid = %s")
     
     def connect(self):
         try:
@@ -39,10 +39,13 @@ class dbHandler():
     def execute(self, statement):
         self.CURSOR.execute(statement)
             
-    def execute_addition(self, statement, data):
+    def execute_data(self, statement, data):
         print(statement)
-        print(astuple(data))
-        self.CURSOR.execute(statement, astuple(data))
+        print(data)
+        if isinstance(data, tuple):
+            self.CURSOR.execute(statement, data)
+        else:
+            self.CURSOR.execute(statement, astuple(data))
         
     def commit(self):
         self.CONN.commit()

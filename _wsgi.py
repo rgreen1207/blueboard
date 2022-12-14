@@ -89,6 +89,7 @@ def application(env, start_response):
 		}
 		start_response('200 OK', [('Content-Type', 'application/json')])
 		print("dump of ret: ", dumps(ret))
+		print("\n\n\n\n\n\n\n\n\n\n\n")
 		return dumps(ret)
 
 	except Exception as inst:
