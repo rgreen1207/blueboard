@@ -1,7 +1,5 @@
 import cgi
-import gevent
 from json import loads, dumps
-from copy import deepcopy
 from urllib import parse as urlparse
 
 from api.request_management import RequestManagement
@@ -46,6 +44,7 @@ def application(env, start_response):
 		return ''
 	
 	path = path.split('/')
+	version = path[1]
     
 	if len(path) < 2 or path[1] != 'v1.0':
 		start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
@@ -82,15 +81,14 @@ def application(env, start_response):
 	#now call the methods as needed
 	try:
 		ret = { 
+			'version': version,
 			'path' : path,
 			'args' : args,
 			'method' : method,
 			'response': RequestManagement(path, method, args).handle_request()
 		}
 		start_response('200 OK', [('Content-Type', 'application/json')])
-		print("dump of ret: ", dumps(ret))
-		print("\n\n\n\n\n\n\n\n\n\n\n")
-		return dumps(ret)
+		return {dumps(ret).encode('utf-8')}
 
 	except Exception as inst:
 		start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
