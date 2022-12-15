@@ -98,6 +98,6 @@ def application(env, start_response):
 
 
 if __name__ == '__main__':
-	wsgi_port = 8888
+	wsgi_port = 8088
 	print('serving on %s...' % wsgi_port)
 	WSGIServer(('', wsgi_port), application).serve_forever()
