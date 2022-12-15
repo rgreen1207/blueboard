@@ -26,7 +26,6 @@ def createUsers():
     insertStatement = ("INSERT INTO users (uuid, username, name, email, sms, created, lastseen) "
     "VALUES (%s, %s, %s, %s, %s, %s, %s)")
     for i in userList:
-        print(astuple(i))
         db.CURSOR.execute(insertStatement, astuple(i))
         #db.commit()
     db.close_connection()

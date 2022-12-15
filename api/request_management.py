@@ -48,14 +48,12 @@ class RequestManagement:
         return ResponseHandler.single_tuple_to_class_dict(res)
         
     def createUser(self):
-        print("creating new user: ", self.args)
         newUser = self.createUserClass()
         self.db.execute_data(self.db.insertStatement, newUser)
         self.db.commit()
         return self.getUser(newUser.uuid)
 
     def updateUser(self, id):
-        print("updating user: ", self.args)
         self.db.execute(self.db.selectUUIDStatement % id)
         res = self.db.CURSOR.fetchone()
         self.db.CURSOR.close()
@@ -64,7 +62,6 @@ class RequestManagement:
         self.updateUserItems(user)
         data = (user.username, user.name, user.email,
                 user.sms, user.created, user.lastseen, user.uuid)
-        print("about to execute")
         self.db.execute_data(self.db.updateUserStatement, data)
         self.db.commit()
         return self.getUser(id)
@@ -78,7 +75,6 @@ class RequestManagement:
 
 
     def createUserClass(self):
-        print("argsList: ", self.args)
         id = User.generate_uuid()
         newUser = User()
         newUser.uuid = id

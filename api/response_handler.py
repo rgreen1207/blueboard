@@ -13,7 +13,6 @@ class ResponseHandler():
             key = i[0]
             val = User(*i[1:]).__dict__
             response_dict.update({key:val})
-        print("response dict is: ", response_dict)
         return response_dict
     
         
